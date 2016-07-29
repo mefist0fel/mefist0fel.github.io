@@ -17,20 +17,61 @@
       <header>
         <h1>Mefist0fel.GitHub.io</h1>
         <p>Text quest engine</p>
-
-        
-
       </header>
       <section>
         <h3> Text quest engine</h3>
 
         <p>Here is some text quest engine prototype. For online interactive literature stories testing.</p>
+        <element id="element">Text base</element>
       </section>
       <footer>
         <p><small><a href="https://github.com/mefist0fel">GitHub Profile</a></small></p>
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
+    <script type="text/javascript">
+      function ParseXML(xmlString) {
+        if (window.DOMParser) {
+        	parser = new DOMParser();
+          xmlDoc = parser.parseFromString(xmlString, "text/xml");
+        } else {
+          xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+          xmlDoc.async = false;
+          xmlDoc.loadXML(xmlString);
+        }
+        return xmlDoc;
+      }
+      
+      function LoadXML(url) {
+      	if (window.XMLHttpRequest) {
+        	xhttp = new XMLHttpRequest();
+        } else {    // IE 5/6
+          xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xhttp.open("GET", url, false);
+        xhttp.send();
+        xmlDoc = xhttp.responseXML;
+        return xmlDoc;
+      }
+      
+      questUri = "https://mefist0fel.github.io/gas_giant_platform.xml";
+      xmlContent = "<test>aff</test>";
+      
+      element = document.getElementById("element");
+      // element.innerHTML = ParseXML(xmlContent).getElementsByTagName("test")[0].childNodes[0].nodeValue;
+      var nodes = LoadXML(questUri).getElementsByTagName("DialogNode")
+      s = ""
+      for (var i = 0; i < nodes.length; i++) {
+      	s += nodes[i].id + "<br/>";
+      	s += nodes[i].getAttribute("quest") + "<br/>";
+        answers = nodes[i].getElementsByTagName("DialogAnswer")
+        for (var j = 0; j < answers.length; j++) {
+      		s += answers[j].getAttribute("answer") + "<br/>";
+        }
+      }
+      
+      element.innerHTML = s;
+    </script>
     
   </body>
 </html>
