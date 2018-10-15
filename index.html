@@ -1,77 +1,207 @@
-<!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Text.Quest by mefistofel</title>
+	<head>
+		<title>Snake 3d game</title>
+		<style type="text/css">
+		body {
+			display: block;
+			background-color:0;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+		}
+		canvas {
+			background-color:#ffffff;
+			display: block;
+			margin: 0px auto;
+		}
+		</style>
+	</head>
+	<body>
+		<canvas id="snake"></canvas>
+	</body>
+	<script type="text/javascript" src="input.js"></script>
+	<script type="text/javascript" src="geometry.js"></script>
+	<script type="text/javascript" src="camera.js"></script>
+	<script type="text/javascript" src="object3d.js"></script>
+	<!--
+	<script type="text/javascript" src="jsfxr.js"></script>
+	<script type="text/javascript" src="audio.js"></script>
+	<script type="text/javascript" src="map.js"></script>-->
+	<script type="text/javascript">
+	let now,
+		dt = 0,
+		time = timestamp(),
+		step = 1/30,
+		width = 1024,
+		height = 768
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-light.css">
-    <meta name="viewport" content="width=device-width">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>Mefist0fel.GitHub.io</h1>
-        <p>Text quest engine</p>
-      </header>
-      <section>
-        <h3> Text quest engine</h3>
+	width = document.documentElement.clientWidth
+	height = document.documentElement.clientHeight
+	let x = 0
+	let y = 0
+	let upVector = CreateVector3(0, 1)
+	let rightVector = CreateVector3(1, 0)
 
-        <p>Here is some text quest engine prototype. For online interactive literature stories testing.</p>
-        <element id="element">Text base</element>
-      </section>
-      <footer>
-        <p><small><a href="https://github.com/mefist0fel">GitHub Profile</a></small></p>
-      </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    <script type="text/javascript">
-      function ParseXML(xmlString) {
-        if (window.DOMParser) {
-        	parser = new DOMParser();
-          xmlDoc = parser.parseFromString(xmlString, "text/xml");
-        } else {
-          xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-          xmlDoc.async = false;
-          xmlDoc.loadXML(xmlString);
-        }
-        return xmlDoc;
-      }
-      
-      function LoadXML(url) {
-      	if (window.XMLHttpRequest) {
-        	xhttp = new XMLHttpRequest();
-        } else {    // IE 5/6
-          xhttp = new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        xhttp.open("GET", url, false);
-        xhttp.send();
-        xmlDoc = xhttp.responseXML;
-        return xmlDoc;
-      }
-      
-      questUri = "https://mefist0fel.github.io/gas_giant_platform.xml";
-      xmlContent = "<test>aff</test>";
-      
-      element = document.getElementById("element");
-      // element.innerHTML = ParseXML(xmlContent).getElementsByTagName("test")[0].childNodes[0].nodeValue;
-      var nodes = LoadXML(questUri).getElementsByTagName("DialogNode")
-      s = ""
-      for (var i = 0; i < nodes.length; i++) {
-      	s += nodes[i].id + "<br/>";
-      	s += nodes[i].getAttribute("quest") + "<br/>";
-        answers = nodes[i].getElementsByTagName("DialogAnswer")
-        for (var j = 0; j < answers.length; j++) {
-      		s += answers[j].getAttribute("answer") + "<br/>";
-        }
-      }
-      
-      element.innerHTML = s;
-    </script>
-    
-  </body>
+	let camera = new Camera(width, height)
+
+	let objects = []
+
+	let size = 5;
+	//cube
+	for (let i = -size; i < size; i++) {
+	 	for (let j = -size; j < size; j++) {
+			let color = '#FFFFFF'
+			if ((parseInt(size + i * 0.5 + 0.5) + parseInt(size + j * 0.5 + 0.5)) % 2 == 1)
+				color = '#666666'
+			// forw
+			let af = CreateVector3( i    , j    , size)
+			let bf = CreateVector3( i + 1, j    , size)
+			let cf = CreateVector3( i + 1, j + 1, size)
+			let df = CreateVector3( i    , j + 1, size)
+			objects.push(new Object3DTriangle(af, bf, cf, color))
+			objects.push(new Object3DTriangle(af, cf, df, color))
+			// backw
+			let ab = CreateVector3( i    , j    ,-size)
+			let bb = CreateVector3( i + 1, j    ,-size)
+			let cb = CreateVector3( i + 1, j + 1,-size)
+			let db = CreateVector3( i    , j + 1,-size)
+			objects.push(new Object3DTriangle(ab, cb, bb, color))
+			objects.push(new Object3DTriangle(ab, db, cb, color))
+			// top
+			let at = CreateVector3( i    , size, j    )
+			let bt = CreateVector3( i + 1, size, j    )
+			let ct = CreateVector3( i + 1, size, j + 1)
+			let dt = CreateVector3( i    , size, j + 1)
+			objects.push(new Object3DTriangle(at, ct, bt, color))
+			objects.push(new Object3DTriangle(at, dt, ct, color))
+			// down
+			let ad = CreateVector3( i    , -size, j    )
+			let bd = CreateVector3( i + 1, -size, j    )
+			let cd = CreateVector3( i + 1, -size, j + 1)
+			let dd = CreateVector3( i    , -size, j + 1)
+			objects.push(new Object3DTriangle(ad, bd, cd, color))
+			objects.push(new Object3DTriangle(ad, cd, dd, color))
+			// left
+			let al = CreateVector3(-size, i    , j    )
+			let bl = CreateVector3(-size, i + 1, j    )
+			let cl = CreateVector3(-size, i + 1, j + 1)
+			let dl = CreateVector3(-size, i    , j + 1)
+			objects.push(new Object3DTriangle(al, cl, bl, color))
+			objects.push(new Object3DTriangle(al, dl, cl, color))
+			// right
+			let ar = CreateVector3( size, i    , j    )
+			let br = CreateVector3( size, i + 1, j    )
+			let cr = CreateVector3( size, i + 1, j + 1)
+			let dr = CreateVector3( size, i    , j + 1)
+			objects.push(new Object3DTriangle(ar, br, cr, color))
+			objects.push(new Object3DTriangle(ar, cr, dr, color))
+		}
+	}
+	// for (let i = -size; i <= size; i++) {
+	// 	for (let j = -size; j <= size; j++) {
+	// 		objects.push(createObject( i, j, size))
+	// 		objects.push(createObject( i, j,-size))
+	// 		objects.push(createObject( i, size, j))
+	// 		objects.push(createObject( i,-size, j))
+	// 		objects.push(createObject( size, i, j))
+	// 		objects.push(createObject(-size, i, j))
+	// 	}
+	// }
+
+	function createObject(x, y, z) {
+		let position = CreateVector3(x, y, z)
+		var r = parseInt((x + 5) * 255 / 10)
+		var g = parseInt((y + 5) * 255 / 10)
+		var b = parseInt((z + 5) * 255 / 10)
+		let color = rgbToHex(r, g, b)
+		return new Object3D(position, color)
+	}
+
+	function rgbToHex(r, g, b) {
+		function componentToHex(c) {
+			var hex = c.toString(16);
+			return hex.length == 1 ? "0" + hex : hex;
+		}
+		return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+	}
+
+	// init
+	let canvasElement = document.getElementById('snake')
+	let canvas = canvasElement.getContext('2d')
+	canvasElement.width = width
+	canvasElement.height = height
+	rect = canvasElement.getBoundingClientRect()
+
+	let input = Input(rect, canvasElement)
+
+	function timestamp() {
+		return window.performance && window.performance.now ? window.performance.now() : new Date().getTime()
+	}
+
+	function render() {
+		// clear
+		canvas.fillStyle = '#000011'
+		canvas.fillRect ( 0, 0, width, height)
+
+		// canvas.fillStyle = '#FFEEEE'
+		for (let i = 0; i < objects.length; i++) {
+			objects[i].prepareScene(camera)
+		}
+		objects.sort(object3DDepthComparator)
+		for (let i = 0; i < objects.length; i++) {
+			objects[i].draw(canvas)
+		}
+
+		// help
+		canvas.fillStyle    = '#FFFFFF'  // white
+		canvas.font = "14pt Arial"
+		canvas.fillText("test", 10, 30)
+		// canvas.fillText("Z / X - change height constant", 10, 50)
+		// canvas.fillText("C / V - change tile aspect", 10, 70)
+		// canvas.fillText("Camera angle " + camera.angle, 10, 90)
+	}
+
+	function update(dt) {
+		// control
+		// UP = 38
+		// DOWN = 40
+		// LEFT = 37
+		// RIGHT = 39
+		// W = 87
+		// S = 83
+		// A = 65
+		// D = 68
+		// space = 32
+		let speed = 60.0 * dt
+		if (input.key[38] || input.key[87]) { // UP
+			y -= speed
+		}
+		if (input.key[40] || input.key[83]) { // DOWN
+			y += speed
+		}
+		if (input.key[37] || input.key[65]) { // LEFT
+			x -= speed
+		}
+		if (input.key[39] || input.key[68]) { // RIGHT
+			x += speed
+		}
+		//worldMatrix = CreateEulerMatrix3(x, 0, 0.0) // MultiplyMatrix3(CreateRotationMatrix3(upVector, x), CreateRotationMatrix3(rightVector, y))
+		camera.worldMatrix = MultiplyMatrix3(CreateMatrix3RotatedX(y), CreateMatrix3RotatedY(x))
+		if (input.key[32]) { // space
+		}
+	}
+	function frame() {
+		now = timestamp()
+		dt = dt + Math.min(1, (now - time) / 1000)
+		if (dt > step) {
+			dt = step
+		}
+		update(step)
+		render()
+		time = now
+		requestAnimationFrame(frame)
+	}
+	requestAnimationFrame(frame)
+
+	</script>
 </html>
