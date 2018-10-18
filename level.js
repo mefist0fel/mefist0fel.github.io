@@ -49,13 +49,59 @@ function createCube(size = 10.0) {
     return objects
 }
 
+function CreateNavigationCube(size = 10.0, navigationRadius = 0.5, edgePolyCount = 3) {
+    let s = size * 0.5
+    let points = [
+        CreateVector3( s, s, s), // 0
+        CreateVector3( s,-s, s), // 1
+        CreateVector3(-s, s, s), // 2
+        CreateVector3(-s,-s, s), // 3
+        CreateVector3( s, s,-s), // 4
+        CreateVector3( s,-s,-s), // 5
+        CreateVector3(-s, s,-s), // 6
+        CreateVector3(-s,-s,-s)  // 7
+    ]
+    return pointsByIds(points, [
+        // up
+        [0, 2, 1],
+        [1, 2, 3],
+        // down
+        [4, 5, 6],
+        [5, 7, 6],
+        // left
+        [0, 6, 2],
+        [0, 4, 6],
+        // right
+        [1, 3, 7],
+        [1, 7, 5],
+        // forw
+        [0, 1, 5],
+        [0, 5, 4],
+        // backw
+        [2, 6, 7],
+        [2, 7, 3]
+    ])
+}
+
+function pointsByIds(points, faceIds) {
+    let mesh = []
+    for(let i = 0; i < faceIds.length; i++) {
+        mesh.push([
+            points[faceIds[i][0]],
+            points[faceIds[i][1]],
+            points[faceIds[i][2]]
+        ])
+    }
+    return mesh
+}
+
 function createDrawedCube(size = 5) {
 	let objects = []
 	for (let i = -size; i < size; i++) {
 	 	for (let j = -size; j < size; j++) {
             let color = '#FFFFFF'
             if ((parseInt(size + i * 0.5 + 0.5) + parseInt(size + j * 0.5 + 0.5)) % 2 == 1)
-                color = '#666666'
+                color = '#AAAAAA'
             // forw
             let af = CreateVector3( i    , j    , size)
             let bf = CreateVector3( i + 1, j    , size)
@@ -70,6 +116,9 @@ function createDrawedCube(size = 5) {
             let db = CreateVector3( i    , j + 1,-size)
             objects.push(new Object3DTriangle(ab, cb, bb, color))
             objects.push(new Object3DTriangle(ab, db, cb, color))
+            color = '#DDDDDD'
+            if ((parseInt(size + i * 0.5 + 0.5) + parseInt(size + j * 0.5 + 0.5)) % 2 == 1)
+                color = '#888888'
             // top
             let at = CreateVector3( i    , size, j    )
             let bt = CreateVector3( i + 1, size, j    )
@@ -84,6 +133,9 @@ function createDrawedCube(size = 5) {
             let dd = CreateVector3( i    , -size, j + 1)
             objects.push(new Object3DTriangle(ad, bd, cd, color))
             objects.push(new Object3DTriangle(ad, cd, dd, color))
+            color = '#BBBBBB'
+            if ((parseInt(size + i * 0.5 + 0.5) + parseInt(size + j * 0.5 + 0.5)) % 2 == 1)
+                color = '#666666'
             // left
             let al = CreateVector3(-size, i    , j    )
             let bl = CreateVector3(-size, i + 1, j    )
@@ -194,7 +246,7 @@ function createObject(x, y, z) {
 
 function rgbToHex(r, g, b) {
     function componentToHex(c) {
-        var hex = c.toString(16);
+        var hex = c.toString(16)
         return hex.length == 1 ? "0" + hex : hex;
     }
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);

@@ -69,6 +69,11 @@ function DotProductVector3(a, b) {
 	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
+function IsEqualVector3(a, b) {
+	let sigma = 0.001
+	return DistanceVector3(a, b) < sigma
+}
+
 function CrossProductVector3(a, b) {
 	return CreateVector3(
 		a[1] * b[2] - a[2] * b[1],
@@ -81,6 +86,10 @@ function Vector3Length(v) {
 	return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
 }
 
+function DistanceVector3(a, b) {
+	return Vector3Length(SubstractVector3(a, b))
+}
+
 function NormalizeVector3(v) {
 	var dist = 1.0 / Vector3Length(v);
 	if (dist == Infinity) {
@@ -90,6 +99,14 @@ function NormalizeVector3(v) {
 		dist = Number.MIN_VALUE;
 	}
 	return MultiplyVector3(v, dist);
+}
+
+function FindMiddlePoint (points) {
+	let sum = CreateVector3()
+	for(let i = 0; i < points.length; i++) {
+		sum = AddVector3(sum, points[i])
+	}
+	return MultiplyVector3(sum, 1.0 / parseFloat(points.length))
 }
 
 // Matrix 3 * 3 functions
@@ -155,18 +172,18 @@ function CreateEulerMatrix3(xAngle = 0.0, yAngle = 0.0, zAngle = 0.0) {
 	]
 }
 
-function CreateRotationMatrix3(axeVector, angle) { // axe vector must be unit // TODO - it WRONG! Rework
-	var x = axeVector[0]
-	var y = axeVector[1]
-	var z = axeVector[2]
-	var radian = angle / 180.0 * Math.PI
-	var c = Math.cos(radian)
-	var s = Math.sin(radian)
-	var q = (1.0 - c)
+function CreateRotationMatrix3(axeVector, angle) { // axe vector must be unit
+	let u = axeVector[0]
+	let v = axeVector[1]
+	let w = axeVector[2]
+	let radian = angle / 180.0 * Math.PI
+	let c = Math.cos(radian)
+	let s = Math.sin(radian)
+	let q = (1.0 - c)
 	return [
-		c + q * x * x,       q * x * y - s * z,   q * x * z + s * y,
-		q * y * x + s * z,   c + q * y * y,       q * y * z - s * x,
-		q * z * x - s * y,   q * z * y - s * x,   c + q * z * z
+		u * u + (1.0 - u * u) * c, 	u * v * q - w * s, 			u * w * q + v * s,
+		u * v * q + w * s,			v * v + (1.0 - v * v) * c,	v * w * q - u * s,
+		u * w * q - v * s,			v * w * q + u * s,			w * w + (1.0 - w * w) * c
 	]
 }
 
@@ -179,16 +196,19 @@ function MultiplyMatrix3(ma, mb) {
 }
 
 function MultiplyVector3ToMatrix3(v, m) {
-	//return [
-	//	v[0] * m[0] + v[1] * m[3] + v[2] * m[6],
-	//	v[0] * m[1] + v[1] * m[4] + v[2] * m[7],
-	//	v[0] * m[2] + v[1] * m[5] + v[2] * m[8]
-	//]
 	return [
 		v[0] * m[0] + v[1] * m[1] + v[2] * m[2],
 		v[0] * m[3] + v[1] * m[4] + v[2] * m[5],
 		v[0] * m[6] + v[1] * m[7] + v[2] * m[8]
 	]
+}
+
+function findMiddlePoint (points) {
+	let sum = CreateVector3()
+	for(let i = 0; i < points.length; i++) {
+		sum = AddVector3(sum, points[i])
+	}
+	return MultiplyVector3(sum, 1.0 / parseFloat(points.length))
 }
 
 // Matrix 4 * 4 functions

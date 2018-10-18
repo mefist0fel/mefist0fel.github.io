@@ -25,6 +25,7 @@
 	<script type="text/javascript" src="object3d.js"></script>
 	<script type="text/javascript" src="level.js"></script>
 	<script type="text/javascript" src="navigation_mesh.js"></script>
+	<script type="text/javascript" src="navigation_node.js"></script>
 	<!--
 	<script type="text/javascript" src="jsfxr.js"></script>
 	<script type="text/javascript" src="audio.js"></script>-->
@@ -38,33 +39,51 @@
 
 	width = document.documentElement.clientWidth
 	height = document.documentElement.clientHeight
-	let x = 45.0
-	let y =-45.0
+	let x = 180 + 45.0
+	let y = -45.0 + 22.5
 	let upVector = CreateVector3(0, 1)
 	let rightVector = CreateVector3(1, 0)
 
 	let camera = new Camera(width, height)
 
-	let objects = createDrawedCube();
-	let nav = new NavigationTriangle(
-		CreateVector3(0.0, 0.0, 0.0),
-		CreateVector3(0.0, 2.0, 0.5),
-		CreateVector3(2.0, 0.0, 0.5)
-	)
-	// objects = []
-	// objects.push(new Object3DTriangle(
-	// 	nav.pointA,
-	// 	nav.pointB,
-	// 	nav.pointC
-	// ))
+	let objects = createDrawedCube()
 
-	// for(let i = 0; i < 10; i++){
-	// 	for(let j = 0; j < 10; j++){
-	// 		let point = CreateVector3(i, j)
-	// 		let projectedPoint = nav.GetProjectionPoint(point)
-	// 		objects.push(new Object3D(projectedPoint, 0.1))
-	// 	}	
-	// }
+	let navigationTriangles = CreateNavigationCube(10.0 + 1.0)
+	let navigationNodes = []
+	for(let i = 0; i < navigationTriangles.length; i++) {
+		let points = navigationTriangles[i]
+		navigationNodes.push(
+			new NavigationNode(
+				points[0],
+				points[1],
+				points[2]
+			)
+		)
+	}
+
+	let navigationMesh = new NavigationMesh(navigationNodes)
+	// objects = []
+	let navigationObjects = []
+	let debugButtonPressed = false
+	let needShowDebugInfo = false
+	for(let i = 0; i < navigationNodes.length; i++) {
+		let navigationTriangle = 
+			new Object3DTriangle(
+				navigationNodes[i].pointA,
+				navigationNodes[i].pointB,
+				navigationNodes[i].pointC,
+				"rgb(255,255,255)", false, false
+			)
+		objects.push(navigationTriangle)
+		navigationObjects.push(navigationTriangle)
+	}
+
+	ShowDebugInfo(needShowDebugInfo)
+	let heroView = new Object3D(navigationMesh.heroPosition, 0.5, rgbToHex(255, 0, 0))
+	let currentCameraDirection = navigationMesh.heroNormal
+	objects.push(heroView)
+	let targetView = new Object3D(AddVector3(navigationMesh.heroPosition, navigationMesh.heroVector), 0.2, rgbToHex(0, 0, 255))
+	objects.push(targetView)
 
 	// init
 	let canvasElement = document.getElementById('snake')
@@ -96,7 +115,7 @@
 		// help
 		canvas.fillStyle    = '#FFFFFF'  // white
 		canvas.font = "14pt Arial"
-		canvas.fillText("test", 10, 30)
+		// canvas.fillText("test", 10, 30)
 		// canvas.fillText("Z / X - change height constant", 10, 50)
 		// canvas.fillText("C / V - change tile aspect", 10, 70)
 		// canvas.fillText("Camera angle " + camera.angle, 10, 90)
@@ -113,24 +132,58 @@
 		// A = 65
 		// D = 68
 		// space = 32
+		let moveSpeed = 2.0 * dt
+		let rotateSpeed = 60.0 * dt
+		if (input.key[87]) {// || input.key[38]) { // UP | W
+			navigationMesh.moveHero(moveSpeed)
+		}
+		if (input.key[83]) {// || input.key[40]) { // DOWN | S
+			navigationMesh.moveHero(-moveSpeed)
+		}
+		if (input.key[65]) {// || input.key[37]) { // LEFT | A
+			navigationMesh.rotateHeroDirection(rotateSpeed)
+		}
+		if (input.key[68]) {// || input.key[39]) { // RIGHT | D
+			navigationMesh.rotateHeroDirection(-rotateSpeed)
+		}
+
 		let speed = 60.0 * dt
-		if (input.key[38] || input.key[87]) { // UP
+		if (input.key[33] || input.key[38]) { // Page UP
 			y -= speed
 		}
-		if (input.key[40] || input.key[83]) { // DOWN
+		if (input.key[34] || input.key[40]) { // Page DOWN
 			y += speed
 		}
-		if (input.key[37] || input.key[65]) { // LEFT
+		if (input.key[35] || input.key[37]) { // HOME
 			x -= speed
 		}
-		if (input.key[39] || input.key[68]) { // RIGHT
+		if (input.key[36] || input.key[39]) { // End
 			x += speed
 		}
-		//worldMatrix = CreateEulerMatrix3(x, 0, 0.0) // MultiplyMatrix3(CreateRotationMatrix3(upVector, x), CreateRotationMatrix3(rightVector, y))
-		camera.worldMatrix = MultiplyMatrix3(CreateMatrix3RotatedX(y), CreateMatrix3RotatedY(x))
+		heroView.position = navigationMesh.heroPosition
+		camera.position = SubstractVector3(CreateVector3(0.0, 0.0, 0.0), heroView.position)
+		targetView.position = AddVector3(navigationMesh.heroPosition, navigationMesh.heroVector)
+		// camera.worldMatrix = MultiplyMatrix3(CreateMatrix3RotatedX(y), CreateMatrix3RotatedY(x))
+		camera.worldMatrix = MultiplyMatrix3(CreateRotationMatrix3(CreateVector3(1.0), y), CreateRotationMatrix3(CreateVector3(0.0, 1.0), x))
 		if (input.key[32]) { // space
 		}
+		if (input.key[113]) { // F2
+			if (!debugButtonPressed) {
+				debugButtonPressed = true
+				needShowDebugInfo = !needShowDebugInfo
+				ShowDebugInfo(needShowDebugInfo)
+			}
+		} else {
+			debugButtonPressed = false
+		}
 	}
+	
+	function ShowDebugInfo(needShow) {
+		for(let i = 0; i < navigationObjects.length; i++) {
+			navigationObjects[i].enabled = needShow;
+		}
+	}
+
 	function frame() {
 		now = timestamp()
 		dt = dt + Math.min(1, (now - time) / 1000)
