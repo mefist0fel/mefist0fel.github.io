@@ -69,6 +69,14 @@ function DotProductVector3(a, b) {
 	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
+function AngleBetweenVector3(a, b) {
+	return Math.acos(DotProductVector3(NormalizeVector3(a), NormalizeVector3(b))) / Math.PI * 180.0
+}
+
+function AxeBetweenVector3(a, b) {
+	return NormalizeVector3(CrossProductVector3(NormalizeVector3(a), NormalizeVector3(b)))
+}
+
 function IsEqualVector3(a, b) {
 	let sigma = 0.001
 	return DistanceVector3(a, b) < sigma
@@ -91,14 +99,24 @@ function DistanceVector3(a, b) {
 }
 
 function NormalizeVector3(v) {
-	var dist = 1.0 / Vector3Length(v);
+	let dist = 1.0 / Vector3Length(v)
+	if (dist == NaN) {
+		dist = Number.MAX_VALUE
+	}
 	if (dist == Infinity) {
-		dist = Number.MAX_VALUE;
+		dist = Number.MAX_VALUE
 	}
 	if (dist == -Infinity) {
-		dist = Number.MIN_VALUE;
+		dist = Number.MIN_VALUE
 	}
-	return MultiplyVector3(v, dist);
+	return MultiplyVector3(v, dist)
+}
+
+function LerpVector3(a, b, t) {
+	return AddVector3(
+		MultiplyVector3(a, 1.0 - t),
+		MultiplyVector3(b, t)
+	)
 }
 
 function FindMiddlePoint (points) {
@@ -211,6 +229,58 @@ function findMiddlePoint (points) {
 	return MultiplyVector3(sum, 1.0 / parseFloat(points.length))
 }
 
+function CreateMatrix3FromQuaternion(quaternion)
+{
+	let x = quaternion[0]
+	let y = quaternion[1]
+	let z = quaternion[2]
+	let w = quaternion[3]
+
+	let x2 = x + x
+	let y2 = y + y
+	let z2 = z + z;
+	let xx = x * x2
+	let xy = x * y2
+	let xz = x * z2
+	let yy = y * y2
+	let yz = y * z2
+	let zz = z * z2
+	let wx = w * x2
+	let wy = w * y2
+	let wz = w * z2
+
+	return [
+		1.0 - (yy + zz),	xy + wz,			xz - wy,
+		xy - wz,			1.0 - (xx + zz), 	yz + wx,
+		xz + wy,			yz - wx, 			1.0 - (xx + yy)
+	]
+}
+
+// Quaternion
+function CreateQuaternion() {
+	return [
+	//	x  y  z  w //  ids
+		0, 0, 0, 1 // 0 1 2 3
+	]
+}
+function CreateQuaternionFromMatrix3(m) {
+	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+	let w = Math.sqrt(1.0 + m[0] + m[4] + m[8]) / 2.0;
+	let w4 = w * 4.0
+	return [
+		(m[7] - m[5]) / w4,
+		(m[2] - m[6]) / w4,
+		(m[3] - m[1]) / w4,
+		w
+	]
+	// x = (m1.m21 - m1.m12) / w4 ;
+	// y = (m1.m02 - m1.m20) / w4 ;
+	// z = (m1.m10 - m1.m01) / w4 ;
+	// 0 1 2   00 01 02
+	// 3 4 5   10 11 12
+	// 6 7 8   20 21 22
+}
+
 // Matrix 4 * 4 functions
 function CreateUnitMatrix4() {
 	return [         //  ids
@@ -220,7 +290,7 @@ function CreateUnitMatrix4() {
 		0, 0, 0, 1   // 12 13 14 15
 	]
 }
-function CreateMatrix4FromMatrix3(m) {
+function CreateMatrix4FromMatrix3(m) { // matrix3 and position
 	return [         //  ids
 		m[0], m[1], m[2],    0,  //  0  1  2  3
 		m[3], m[4], m[5],    0,  //  4  5  6  7

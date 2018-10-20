@@ -155,7 +155,7 @@ function createDrawedCube(size = 5) {
     return objects
 }
 
-function createSphere(radius = 10.0, segments = 7) {
+function createSphere(radius = 5.0, segments = 9) {
     let objects = []
     let size = 1.0 / (segments)
     let createNormalizedPoint = function(x, y, size, radius, sideMatrix) {
@@ -177,21 +177,60 @@ function createSphere(radius = 10.0, segments = 7) {
     for(let sideId = 0; sideId < sidesRotationMatrix.length; sideId ++) {
         for (let i = 0; i < segments; i++) {
             for (let j = 0; j < segments; j++) {
-                let color = '#FFFFFF'
-                if ((i + j) % 2 == 1)
-                    color = '#666666'
                 
                 // forw
                 let af = createNormalizedPoint(     i,     j, size, radius, sidesRotationMatrix[sideId])
                 let bf = createNormalizedPoint( i + 1,     j, size, radius, sidesRotationMatrix[sideId])
                 let cf = createNormalizedPoint( i + 1, j + 1, size, radius, sidesRotationMatrix[sideId])
                 let df = createNormalizedPoint(     i, j + 1, size, radius, sidesRotationMatrix[sideId])
+                let normal = createNormalizedPoint(i + 0.5, j + 0.5, size, 1.0, sidesRotationMatrix[sideId])
+                let fakeLight = normal[0] * 0.5 + 0.5
+                let lightColor = parseInt((fakeLight * 0.6 + 0.4) * 255.0)
+                let darkColor = parseInt((fakeLight * 0.6 + 0.4) * 195.0)
+                let color = rgbToHex(lightColor, lightColor, lightColor)
+                if ((i + j) % 2 == 1)
+                    color = rgbToHex(darkColor, darkColor, darkColor)
                 objects.push(new Object3DTriangle(af, bf, cf, color))
                 objects.push(new Object3DTriangle(af, cf, df, color))
             }
         }
     }
     return objects
+}
+
+function CreateNavigationSphere(radius = 5.0, navigationRadius = 0.5, segments = 9) {
+    let navigationTriangles = []
+    let size = 1.0 / (segments)
+    let fullRadius = radius + navigationRadius
+    let createNormalizedPoint = function(x, y, size, radius, sideMatrix) {
+        let point = CreateVector3(x * size - 0.5, y * size - 0.5, 0.5)
+        return MultiplyVector3ToMatrix3(
+            MultiplyVector3(
+                NormalizeVector3(point),
+                radius),
+            sideMatrix)
+    }
+    let sidesRotationMatrix = [
+        CreateMatrix3RotatedX(0.0),
+        CreateMatrix3RotatedX(90.0),
+        CreateMatrix3RotatedX(180.0),
+        CreateMatrix3RotatedX(270.0),
+        CreateMatrix3RotatedY(90.0),
+        CreateMatrix3RotatedY(270.0),
+    ]
+    for(let sideId = 0; sideId < sidesRotationMatrix.length; sideId ++) {
+        for (let i = 0; i < segments; i++) {
+            for (let j = 0; j < segments; j++) {
+                let af = createNormalizedPoint(     i,     j, size, fullRadius, sidesRotationMatrix[sideId])
+                let bf = createNormalizedPoint( i + 1,     j, size, fullRadius, sidesRotationMatrix[sideId])
+                let cf = createNormalizedPoint( i + 1, j + 1, size, fullRadius, sidesRotationMatrix[sideId])
+                let df = createNormalizedPoint(     i, j + 1, size, fullRadius, sidesRotationMatrix[sideId])
+                navigationTriangles.push([af, bf, cf])
+                navigationTriangles.push([af, cf, df])
+            }
+        }
+    }
+    return navigationTriangles
 }
 
 function createCilynder(sides = 16, radius = 5.0, height = 10.0) {
