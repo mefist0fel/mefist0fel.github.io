@@ -1,3 +1,7 @@
+function inRect(x, y, rsx, rsy, rex, rey) { // Rect start x/y and Rect end x/y
+	return (x >= rsx) && (x <= rex) && (y >= rsy) && (y <= rey)
+}
+
 // vector 2 functions
 function CreateVector2(x = 0.0, y = 0.0) {
 	return [x, y,]
@@ -13,6 +17,13 @@ function SubstractVector2(a, b) {
 
 function MultiplyVector2(v, multiplier) {
 	return [v[0] * multiplier, v[1] * multiplier]
+}
+
+function LerpVector2(a, b, t) {
+	return AddVector2(
+		MultiplyVector2(a, 1.0 - t),
+		MultiplyVector2(b, t)
+	)
 }
 
 function Vector2Length(v) {

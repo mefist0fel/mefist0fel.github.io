@@ -25,48 +25,53 @@ function Input() {
 		input.key[keyCode] = value
 	}
 
-	function onkeydown(event) {
+	function onKeyDown(event) {
 		setKey(event.keyCode, true)
 	}
-	function onkeyup(event) {
+	function onKeyUp(event) {
 		setKey(event.keyCode, false)
 	}
 
-	function onclick(event) {
-		//ballCoord[0] = event.clientX - rect.left;
-		//ballCoord[1] = event.clientY - rect.top;
-	}
+	function onClick(event) {}
 
-	function mousedown(event) {
+	function mouseDown(event) {
 		input.mouseLeft = true
 		input.mousePosition[0] = event.clientX
 		input.mousePosition[1] = event.clientY
 	}
 
-	function mouseup(event) {
+	function mouseUp(event) {
 		input.mouseLeft = false
 		input.mousePosition[0] = event.clientX
 		input.mousePosition[1] = event.clientY
 	}
 
-	function mousemove(event) {
+	function mouseMove(event) {
 		input.mousePosition[0] = event.clientX
 		input.mousePosition[1] = event.clientY
 	}
 
-	function ontouchstart(event) {
+	function onTouchStart(event) {
 	}
 
-	function ontouchmove(event) {
+	function onTouchMove(event) {
 	}
 
-	document.addEventListener('keydown',    onkeydown,    false)
-	document.addEventListener('keyup',      onkeyup,      false)
-	document.addEventListener('click',		onclick,	  false)
-	document.addEventListener('mousedown',  mousedown,	  false)
-	document.addEventListener('mouseup',	mouseup,	  false)
-	document.addEventListener('mousemove',	mousemove,	  false)
-	// document.addEventListener('touchstart', ontouchstart, false)
-	// document.addEventListener('touchmove',	ontouchmove,  false)
+	function onTouchEnd(event) {
+	}
+
+	function onTouchCancel(event) {
+	}
+
+	document.addEventListener('keydown',     onKeyDown,    false)
+	document.addEventListener('keyup',       onKeyUp,      false)
+	document.addEventListener('click',		 onClick,	  false)
+	document.addEventListener('mousedown',   mouseDown,	  false)
+	document.addEventListener('mouseup',	 mouseUp,	  false)
+	document.addEventListener('mousemove',	 mouseMove,	  false)
+	document.addEventListener('touchstart',  onTouchStart, false)
+	document.addEventListener('touchmove',	 onTouchMove,  false)
+	document.addEventListener("touchend", 	 onTouchEnd, false);
+	document.addEventListener("touchcancel", onTouchCancel, false);
 	return input;
 }
