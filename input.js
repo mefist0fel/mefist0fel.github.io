@@ -1,4 +1,4 @@
-function Input(rect, canvasElement) {
+function Input() {
 	//  KEY KODES
 	//	BACKSPACE: 8,
 	//	TAB:       9,	RETURN:   13,
@@ -18,18 +18,18 @@ function Input(rect, canvasElement) {
 		mousePosition: [0, 0]
 	}
 	for(var i = 0; i < 200; i++) {
-		input.key[i] = false;
+		input.key[i] = false
 	}
 
 	function setKey(keyCode, value) {
-		input.key[keyCode] = value;
+		input.key[keyCode] = value
 	}
 
 	function onkeydown(event) {
-		setKey(event.keyCode, true);
+		setKey(event.keyCode, true)
 	}
 	function onkeyup(event) {
-		setKey(event.keyCode, false);
+		setKey(event.keyCode, false)
 	}
 
 	function onclick(event) {
@@ -38,16 +38,16 @@ function Input(rect, canvasElement) {
 	}
 
 	function mousedown(event) {
-		input.mouseLeft = true;
+		input.mouseLeft = true
 	}
 
 	function mouseup(event) {
-		input.mouseLeft = false;
+		input.mouseLeft = false
 	}
 
 	function mousemove(event) {
-		input.mousePosition[0] = event.clientX - rect.left;
-		input.mousePosition[1] = event.clientY - rect.top;
+		input.mousePosition[0] = event.clientX
+		input.mousePosition[1] = event.clientY
 	}
 
 	function ontouchstart(event) {
@@ -56,20 +56,13 @@ function Input(rect, canvasElement) {
 	function ontouchmove(event) {
 	}
 
-	document.addEventListener('keydown',    onkeydown,    false);
-	document.addEventListener('keyup',      onkeyup,      false);
-
-	//canvasElement.addEventListener('click',		onclick,		false);
-	//canvasElement.addEventListener('mousedown', mousedown,		false);
-	//canvasElement.addEventListener('mouseup',	mouseup,		false);
-	//canvasElement.addEventListener('mousemove',	mousemove,		false);
-	//canvasElement.addEventListener('touchstart',ontouchstart,	false);
-	//canvasElement.addEventListener('touchmove',	ontouchmove,	false);
-	document.addEventListener('click',		onclick,		false);
-	document.addEventListener('mousedown',  mousedown,		false);
-	document.addEventListener('mouseup',	mouseup,		false);
-	document.addEventListener('mousemove',	mousemove,		false);
-	document.addEventListener('touchstart', ontouchstart,	false);
-	document.addEventListener('touchmove',	ontouchmove,	false);
+	document.addEventListener('keydown',    onkeydown,    false)
+	document.addEventListener('keyup',      onkeyup,      false)
+	document.addEventListener('click',		onclick,	  false)
+	document.addEventListener('mousedown',  mousedown,	  false)
+	document.addEventListener('mouseup',	mouseup,	  false)
+	document.addEventListener('mousemove',	mousemove,	  false)
+	document.addEventListener('touchstart', ontouchstart, false)
+	document.addEventListener('touchmove',	ontouchmove,  false)
 	return input;
 }
