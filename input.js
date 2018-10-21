@@ -39,10 +39,14 @@ function Input() {
 
 	function mousedown(event) {
 		input.mouseLeft = true
+		input.mousePosition[0] = event.clientX
+		input.mousePosition[1] = event.clientY
 	}
 
 	function mouseup(event) {
 		input.mouseLeft = false
+		input.mousePosition[0] = event.clientX
+		input.mousePosition[1] = event.clientY
 	}
 
 	function mousemove(event) {
@@ -62,7 +66,7 @@ function Input() {
 	document.addEventListener('mousedown',  mousedown,	  false)
 	document.addEventListener('mouseup',	mouseup,	  false)
 	document.addEventListener('mousemove',	mousemove,	  false)
-	document.addEventListener('touchstart', ontouchstart, false)
-	document.addEventListener('touchmove',	ontouchmove,  false)
+	// document.addEventListener('touchstart', ontouchstart, false)
+	// document.addEventListener('touchmove',	ontouchmove,  false)
 	return input;
 }
