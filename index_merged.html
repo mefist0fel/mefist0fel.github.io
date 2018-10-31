@@ -468,31 +468,7 @@ function MultiplyMatrix4(ma, mb) {
 		input.mousePosition[1] = event.clientY
 	}
 
-	function onTouchStart(event) {
-		input.touches = []
-		for(let i = 0; i < event.touches.length; i++) {
-			touches.push([event.touches[i].clientX, event.touches[i].clientY])
-		}
-		event.preventDefault()
-	}
-
-	function onTouchMove(event) {
-		input.touches = []
-		for(let i = 0; i < event.touches.length; i++) {
-			touches.push([event.touches[i].clientX, event.touches[i].clientY])
-		}
-		event.preventDefault()
-	}
-
-	function onTouchEnd(event) {
-		input.touches = []
-		for(let i = 0; i < event.touches.length; i++) {
-			touches.push([event.touches[i].clientX, event.touches[i].clientY])
-		}
-		event.preventDefault()
-	}
-
-	function onTouchCancel(event) {
+	function onTouch(event) {
 		input.touches = []
 		for(let i = 0; i < event.touches.length; i++) {
 			touches.push([event.touches[i].clientX, event.touches[i].clientY])
@@ -506,10 +482,10 @@ function MultiplyMatrix4(ma, mb) {
 	document.addEventListener('mousedown',   mouseDown,	  false)
 	document.addEventListener('mouseup',	 mouseUp,	  false)
 	document.addEventListener('mousemove',	 mouseMove,	  false)
-	document.addEventListener('touchstart',  onTouchStart, false)
-	document.addEventListener('touchmove',	 onTouchMove,  false)
-	document.addEventListener("touchend", 	 onTouchEnd, false);
-	document.addEventListener("touchcancel", onTouchCancel, false);
+	document.addEventListener('touchstart',  onTouch, false)
+	document.addEventListener('touchmove',	 onTouch,  false)
+	document.addEventListener("touchend", 	 onTouch, false);
+	document.addEventListener("touchcancel", onTouch, false);
 	return input;
 }
 
@@ -1435,7 +1411,8 @@ class NavigationMesh {
 		for(let i = 0; i < input.touches.length; i++) {
 			touches += input.touches[i] + "\n" 
 		}
-		canvas.fillText("touches: " + touches, 10, 30)
+		touches += input.mousePosition + "\n"
+		canvas.fillText("touches:\n" + touches, 10, 30)
 	}
 
 	function renderSelectLevelState() {
