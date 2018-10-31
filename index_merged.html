@@ -473,18 +473,19 @@ function MultiplyMatrix4(ma, mb) {
 		for(let i = 0; i < event.touches.length; i++) {
 			input.touches.push([event.touches[i].clientX, event.touches[i].clientY])
 		}
+		event.preventDefault()
 	}
-
-	document.addEventListener('keydown',     onKeyDown,   false)
-	document.addEventListener('keyup',       onKeyUp,      false)
-	document.addEventListener('click',		 onClick,	  false)
-	document.addEventListener('mousedown',   mouseDown,	  false)
-	document.addEventListener('mouseup',	 mouseUp,	  false)
-	document.addEventListener('mousemove',	 mouseMove,	  false)
-	document.addEventListener('touchstart',  onTouch)
-	document.addEventListener('touchmove',	 onTouch)
-	document.addEventListener('touchend', 	 onTouch);
-	document.addEventListener("touchcancel", onTouch);
+	let passiveTouchMark = {passive: false}
+	document.addEventListener('keydown',     onKeyDown,   passiveTouchMark)
+	document.addEventListener('keyup',       onKeyUp,     passiveTouchMark)
+	document.addEventListener('click',		 onClick,	  passiveTouchMark)
+	document.addEventListener('mousedown',   mouseDown,	  passiveTouchMark)
+	document.addEventListener('mouseup',	 mouseUp,	  passiveTouchMark)
+	document.addEventListener('mousemove',	 mouseMove,	  passiveTouchMark)
+	document.addEventListener('touchstart',  onTouch, passiveTouchMark)
+	document.addEventListener('touchmove',	 onTouch, passiveTouchMark)
+	document.addEventListener('touchend', 	 onTouch, passiveTouchMark);
+	document.addEventListener("touchcancel", onTouch, passiveTouchMark);
 	return input;
 }
 
