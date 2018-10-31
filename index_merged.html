@@ -471,21 +471,20 @@ function MultiplyMatrix4(ma, mb) {
 	function onTouch(event) {
 		input.touches = []
 		for(let i = 0; i < event.touches.length; i++) {
-			touches.push([event.touches[i].clientX, event.touches[i].clientY])
+			input.touches.push([event.touches[i].clientX, event.touches[i].clientY])
 		}
-		event.preventDefault()
 	}
 
-	document.addEventListener('keydown',     onKeyDown,    false)
+	document.addEventListener('keydown',     onKeyDown,   false)
 	document.addEventListener('keyup',       onKeyUp,      false)
 	document.addEventListener('click',		 onClick,	  false)
 	document.addEventListener('mousedown',   mouseDown,	  false)
 	document.addEventListener('mouseup',	 mouseUp,	  false)
 	document.addEventListener('mousemove',	 mouseMove,	  false)
-	document.addEventListener('touchstart',  onTouch, false)
-	document.addEventListener('touchmove',	 onTouch,  false)
-	document.addEventListener("touchend", 	 onTouch, false);
-	document.addEventListener("touchcancel", onTouch, false);
+	document.addEventListener('touchstart',  onTouch)
+	document.addEventListener('touchmove',	 onTouch)
+	document.addEventListener('touchend', 	 onTouch);
+	document.addEventListener("touchcancel", onTouch);
 	return input;
 }
 
