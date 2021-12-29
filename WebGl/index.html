@@ -55,12 +55,11 @@
         updateBannerVisibility();
       }
 
-      var buildUrl = "https://mefist0fel.github.io/WebGl/Build";
-      var loaderUrl = buildUrl + "/Build.loader.js";
+      var loaderUrl = "Build2.loader.js";
       var config = {
-        dataUrl: buildUrl + "/Build.data",
-        frameworkUrl: buildUrl + "/Build.framework.js",
-        codeUrl: buildUrl + "/Build.wasm",
+        dataUrl: "Build2.data",
+        frameworkUrl: "Build2.framework.js",
+        codeUrl: "Build2.wasm",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Sberdevices",
         productName: "WebGLTest",
@@ -75,11 +74,10 @@
       // the canvas DOM size and WebGL render target sizes yourself.
       // config.matchWebGLToCanvasSize = false;
 
+	// Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
 
-        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
+	canvas.style.width = "960px";
+	canvas.style.height = "600px";
 
       loadingBar.style.display = "block";
 
