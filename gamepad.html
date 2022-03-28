@@ -1,0 +1,56 @@
+<html>
+	<head>
+		<title>Elements prot</title>
+		<style type="text/css">
+		body {
+			display: block;
+			background-color:0;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+		}
+		canvas {
+			background-color:#ffffff;
+			display: block;
+			margin: 0px auto;
+		}
+		</style>
+	</head>
+	<body>
+		<canvas id="tutorial"></canvas>
+		<!-- форма для отправки сообщений -->
+		<form name="publish">
+		  <input type="text" name="message">
+		  <input type="submit" value="Отправить">
+		</form>
+
+		<!-- здесь будут появляться входящие сообщения -->
+		<div id="subscribe"></div>
+	</body>
+	<script type="text/javascript">
+	console.log("start 1")
+	var socket = new WebSocket("ws://192.168.1.28:4545/path");
+
+	// отправить сообщение из формы publish
+	document.forms.publish.onsubmit = function() {
+	  var outgoingMessage = this.message.value;
+		console.log("send " + outgoingMessage);
+
+	  socket.send(outgoingMessage);
+	  return false;
+	};
+
+	// обработчик входящих сообщений
+	socket.onmessage = function(event) {
+	  var incomingMessage = event.data;
+	  showMessage(incomingMessage);
+	};
+
+	// показать сообщение в div#subscribe
+	function showMessage(message) {
+	  var messageElem = document.createElement('div');
+	  messageElem.appendChild(document.createTextNode(message));
+	  document.getElementById('subscribe').appendChild(messageElem);
+	}
+	</script>
+</html>
